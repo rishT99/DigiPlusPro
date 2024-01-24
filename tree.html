@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    #tree-container {
+      margin: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .node {
+      margin: 5px;
+      padding: 10px;
+      cursor: pointer;
+      text-align: center;
+      width: 150px;
+      position: relative;
+      z-index: 1; /* Ensure nodes appear above lines */
+    }
+
+    .child-node {
+      margin-top: 10px;
+    }
+
+    .tree-line {
+      position: absolute;
+      border-left: 2px solid #ccc;
+      height: 100%;
+      top: 0;
+      left: 50%;
+      z-index: 0; /* Ensure lines appear behind nodes */
+    }
+
+    #warning-message {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div>
+  <label for="nodeType">Node Type:</label>
+  <select id="nodeType">
+    <option value="single">Single Node</option>
+    <option value="child">Child Node</option>
+    <option value="parent">Parent Node</option>
+  </select>
+  <button onclick="addNode()">Add Node</button>
+  <p id="warning-message"></p>
+</div>
+
+<div id="tree-container"></div>
+
+<script>
+  function addNode() {
+    const nodeType = document.getElementById('nodeType').value;
+    const treeContainer = document.getElementById('tree-container');
+    const warningMessage = document.getElementById('warning-message');
+
+    const newNode = document.createElement('div');
+    newNode.classList.add('node');
+    newNode.innerText = 'Node Type: ' + nodeType;
+
+    newNode.addEventListener('click', function () {
+      clearSelection();
+      newNode.classList.add('selected');
+    });
+
+    if (nodeType === 'child' || nodeType === 'parent') {
+      const parentNode = document.querySelector('.node.selected');
+
+      if (parentNode) {
+        newNode.classList.add('child-node');
+        treeContainer.appendChild(newNode);
+        createTreeLine(parentNode, newNode);
+        warningMessage.innerText = ''; // Clear any previous warning
+      } else {
+        warningMessage.innerText = 'Warning: Please select a parent node first or create a parent node.';
+      }
+    } else {
+      newNode.classList.add('single-node');
+      treeContainer.appendChild(newNode);
+      warningMessage.innerText = ''; // Clear any previous warning
+    }
+
+    // Clear selection after adding node
+    clearSelection();
+  }
+
+  function clearSelection() {
+    const nodes = document.querySelectorAll('.node');
+    nodes.forEach(node => node.classList.remove('selected'));
+  }
+
+  function createTreeLine(parentNode, childNode) {
+    const treeLine = document.createElement('div');
+    treeLine.classList.add('tree-line');
+    treeLine.style.height = (childNode.offsetTop - parentNode.offsetTop) + 'px';
+    treeLine.style.transform = 'translateX(-50%)';
+    treeContainer.appendChild(treeLine);
+  }
+</script>
+
+</body>
+</html>
